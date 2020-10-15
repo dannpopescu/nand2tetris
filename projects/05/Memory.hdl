@@ -27,5 +27,16 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // Compute load bit for RAM and Screen
+    DMux(in=load, sel=address[14], a=loadRAM, b=loadIO);
+    DMux(in=loadIO, sel=address[13], a=loadScreen, b=loadInvalidLocation);
+
+    // Get Outputs
+    RAM16K(in=in, load=loadRAM, address=address[0..13], out=RAMOut);
+    Screen(in=in, load=loadScreen, address=address[0..12], out=ScreenOut);
+    Keyboard(out=KeyboardOut);
+
+    // Route outputs based on address
+    Mux16(a=ScreenOut, b=KeyboardOut, sel=address[13], out=IOOut);
+    Mux16(a=RAMOut, b=IOOut, sel=address[14], out=out);
 }
